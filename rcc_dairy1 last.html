@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>দোকানের হিসাব ও ক্যাশ খাতা</title>
+    <!-- Bootstrap 5.3 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --border-color: #000000;
+        }
+
+        body {
+            font-size: 14px;
+            background-color: var(--bg-color);
+            font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1300px !important;
+            width: 100%;
+            padding-left: 6px;
+            padding-right: 6px;
+            margin-top: 6px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 8px !important;
+            background-color: var(--card-bg);
+            padding: 8px 10px !important;
+        }
+
+        .form-control, .form-select {
+            font-size: 14px !important;
+            padding: 5px 9px !important;
+            height: 35px !important;
+            border-radius: 6px;
+            color: var(--text-main) !important;
+            border: 1px solid #cbd5e1;
+            background-color: #fff;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 3px;
+            color: #475569 !important;
+            display: block;
+        }
+
+        .page-title {
+            text-align: center;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0;
+            font-size: 18px;
+            letter-spacing: -0.3px;
+            width: 100%;
+        }
+
+        .header-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* সামারি কন্টেইনার */
+        .summary-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+            flex-wrap: nowrap !important;
+            width: 100%;
+        }
+
+        .summary-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 2px 2px !important;
+            text-align: center;
+            background: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            white-space: nowrap;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            font-weight: 700;
+            display: block;
+            line-height: 1.2;
+        }
+
+        .summary-value {
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        @media (min-width: 768px) {
+            .summary-container {
+                justify-content: center;
+                gap: 10px;
+            }
+            .summary-box {
+                flex: initial;
+                min-width: 130px;
+                padding: 5px 10px !important;
+            }
+            .summary-label {
+                font-size: 12px;
+            }
+            .summary-value {
+                font-size: 14px;
+            }
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            max-height: 500px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            scrollbar-width: thin;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 0 !important;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        table th, table td {
+            font-size: 13px !important;
+            padding: 5px 8px !important;
+            vertical-align: middle !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color) !important;
+            background-color: #ffffff;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #0f172a !important;
+            color: white !important;
+            font-size: 13px !important;
+            font-weight: 600;
+            padding: 6px 8px !important;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        table td.date-column, table th.date-column {
+            white-space: nowrap !important;
+        }
+
+        table td.note-column {
+            white-space: normal !important;
+            word-break: break-word;
+            text-align: left !important;
+            min-width: 180px;
+        }
+
+        @media (min-width: 992px) {
+            table th, table td {
+                padding: 5px 8px !important;
+            }
+        }
+
+        table td.text-start-custom, table th.text-start-custom {
+            text-align: left !important;
+        }
+
+        table tbody tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .action-col {
+            white-space: nowrap !important;
+        }
+        .action-col button {
+            display: inline-block !important;
+        }
+
+        .btn-custom {
+            font-size: 14px;
+            padding: 5px 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            height: 35px !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .badge-given {
+            background-color: #fee2e2;
+            color: #991b1b !important;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .badge-got {
+            background-color: #d1fae5;
+            color: #065f46 !important;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* সেকশন দৃশ্যমানতা নিয়ন্ত্রণ */
+        #loginSection {
+            display: flex;
+            min-height: 70vh !important;
+            align-items: center;
+            justify-content: center;
+        }
+        #dashboardSection {
+            display: none;
+        }
+
+        /* প্রিন্ট সেকশন */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 5mm;
+            }
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                font-size: 9px !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            #loginSection, #transactionFormCard, #filterSection, .position-absolute, button, .btn, .no-print, .action-col {
+                display: none !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: none !important;
+                outline: none !important;
+                background-color: transparent !important;
+                padding: 0 !important;
+                margin-bottom: 3px !important;
+            }
+            .page-title {
+                font-size: 12px !important;
+                color: #000000 !important;
+                text-align: center !important;
+                margin-bottom: 3px !important;
+            }
+            .summary-container {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                gap: 4px !important;
+                margin-bottom: 5px !important;
+                width: 100% !important;
+                flex-wrap: nowrap !important;
+            }
+            .summary-box {
+                border: 1px solid #000000 !important;
+                padding: 2px 4px !important;
+                max-width: 100px !important;
+                min-width: 65px !important;
+                flex: 1 !important;
+            }
+            .table-responsive {
+                border: none !important;
+                outline: none !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                border: none !important;
+            }
+            table th, table td {
+                border: 1px solid #000000 !important;
+                color: #000000 !important;
+                font-size: 9px !important;
+                padding: 3px 4px !important;
+                background-color: transparent !important;
+                white-space: nowrap !important;
+            }
+            table td.note-column {
+                white-space: normal !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ১. লগইন পেজ -->
+    <div id="loginSection" class="container">
+        <div class="card p-3 shadow-sm mx-auto" style="width: 100%; max-width: 400px; margin-top: 5vh;">
+            <h3 class="text-center mb-3 fw-bold text-primary" style="font-size: 20px;">🔐 সিস্টেমে লগইন</h3>
+            <div class="mb-2">
+                <label>ইউজারনেম (Username)</label>
+                <input type="text" id="loginUser" class="form-control" placeholder="ইউজারনেম দিন">
+            </div>
+            <div class="mb-3">
+                <label>পাসওয়ার্ড (Password)</label>
+                <input type="password" id="loginPass" class="form-control" placeholder="পাসওয়ার্ড দিন">
+            </div>
+            <button onclick="handleLogin()" class="btn btn-primary w-100 fw-bold btn-custom">লগইন করুন</button>
+            <div id="loginError" class="text-danger text-center mt-2" style="font-size: 12px;"></div>
+        </div>
+    </div>
+
+    <!-- ২. মূল ড্যাশবোর্ড সেকশন -->
+    <div id="dashboardSection" class="container">
+        
+        <!-- হেডার সেকশন -->
+        <div class="header-container">
+            <h2 class="page-title">🏪 দোকান ও ক্যাশ খাতা ম্যানেজমেন্ট</h2>
+            <div class="header-actions">
+                <span id="userRoleBadge" class="badge bg-secondary px-2 py-1" style="font-size: 12px;">রোল</span>
+                <button onclick="openSettingsModal()" class="btn btn-outline-dark btn-sm fw-bold px-2 py-1" style="height: 28px; font-size: 12px;">⚙ সেটিংস</button>
+                <button onclick="handleLogout()" class="btn btn-outline-danger btn-sm fw-bold px-2 py-1" style="height: 28px; font-size: 12px;">লগআউট</button>
+            </div>
+        </div>
+
+        <!-- টোটাল সামারি লাইন -->
+        <div class="summary-container">
+            <div class="summary-box border-danger" style="border-left: 3px solid #ef4444 !important;">
+                <span class="text-danger summary-label">মোট দিলাম:</span>
+                <span id="totalGivenDisplay" class="summary-value text-danger">৳ 0</span>
+            </div>
+            <div class="summary-box border-success" style="border-left: 3px solid #10b981 !important;">
+                <span class="text-success summary-label">মোট পেলাম:</span>
+                <span id="totalGotDisplay" class="summary-value text-success">৳ 0</span>
+            </div>
+            <div class="summary-box border-primary" style="border-left: 3px solid #4f46e5 !important;">
+                <span id="netBalanceTitle" class="text-primary summary-label">নিট ব্যালেন্স:</span>
+                <span id="netBalanceDisplay" class="summary-value text-primary">৳ 0</span>
+            </div>
+        </div>
+
+        <!-- টগল বাটনসমূহ -->
+        <div class="d-flex justify-content-center gap-2 mb-2 no-print">
+            <button onclick="toggleSection('transactionFormCard')" class="btn btn-primary btn-sm fw-bold" style="font-size: 12px;">➕ নতুন লেনদেন যোগ করুন</button>
+            <button onclick="toggleSection('filterSection')" class="btn btn-dark btn-sm fw-bold" style="font-size: 12px;">🔍 সার্চ ও ফিল্টার</button>
+        </div>
+
+        <!-- নতুন লেনদেন ফর্ম -->
+        <div class="card mb-2" id="transactionFormCard" style="display: none;">
+            <h5 id="formTitle" class="mb-2 text-primary fw-bold text-center" style="font-size: 15px;">➕ নতুন লেনদেন যোগ করুন</h5>
+            <form id="transactionForm">
+                <input type="hidden" id="editId">
+                
+                <div class="row g-2 mb-2">
+                    <div class="col-6 col-md-3">
+                        <label>তারিখ *</label>
+                        <input type="date" id="txnDate" class="form-control" required>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label>প্রতিষ্ঠানের নাম *</label>
+                        <input type="text" id="organizationName" class="form-control" list="orgListOptions" placeholder="প্রতিষ্ঠানের নাম দিন/সিলেক্ট করুন" onchange="onOrgSelect()" required>
+                        <datalist id="orgListOptions"></datalist>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label>গ্রাহক/ব্যক্তির নাম *</label>
+                        <input type="text" id="customerName" class="form-control" list="customerListOptions" placeholder="ব্যক্তির নাম দিন/সিলেক্ট করুন" required>
+                        <datalist id="customerListOptions"></datalist>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label>মোবাইল</label>
+                        <input type="text" id="mobile" class="form-control" placeholder="017xxxxxxxx">
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2">
+                    <div class="col-6 col-md-3">
+                        <label>ঠিকানা</label>
+                        <input type="text" id="address" class="form-control" placeholder="এলাকা">
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label>লেনদেনের ধরন *</label>
+                        <select id="transactionType" class="form-select" required>
+                            <option value="given">টাকা প্রদান</option>
+                            <option value="got">টাকা গ্রহণ</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label>নোট/বিবরণ</label>
+                        <input type="text" id="note" class="form-control" placeholder="বিস্তারিত বিবরণ">
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label>পরিমাণ (৳) *</label>
+                        <input type="number" id="amount" class="form-control" placeholder="টাকার পরিমাণ" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 text-center d-flex justify-content-center gap-2">
+                        <button type="submit" id="saveBtn" class="btn btn-primary btn-custom px-4">সেভ করুন</button>
+                        <button type="button" id="cancelEditBtn" class="btn btn-outline-secondary btn-custom px-3" onclick="cancelEditMode()">বাতিল</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- ফিল্টার ও সার্চ সেকশন -->
+        <div class="card mb-2" id="filterSection" style="display: none;">
+            <div id="printFilterRow" class="row align-items-end g-2">
+                <div class="col-6 col-md-2">
+                    <label class="fw-bold">🔍 প্রতিষ্ঠান:</label>
+                    <select id="filterOrg" class="form-select" onchange="applyFilters()">
+                        <option value="all">সকল প্রতিষ্ঠান</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="fw-bold">বছর:</label>
+                    <select id="filterYear" class="form-select" onchange="applyFilters()">
+                        <option value="all">সকল বছর</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="fw-bold">মাস:</label>
+                    <select id="filterMonth" class="form-select" onchange="applyFilters()">
+                        <option value="all">সকল মাস</option>
+                        <option value="01">জানুয়ারি</option>
+                        <option value="02">ফেব্রুয়ারি</option>
+                        <option value="03">মার্চ</option>
+                        <option value="04">এপ্রিল</option>
+                        <option value="05">মে</option>
+                        <option value="06">জুন</option>
+                        <option value="07">জুলাই</option>
+                        <option value="08">আগস্ট</option>
+                        <option value="09">সেপ্টেম্বর</option>
+                        <option value="10">অক্টোবর</option>
+                        <option value="11">নভেম্বর</option>
+                        <option value="12">ডিসেম্বর</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="fw-bold">তারিখ থেকে:</label>
+                    <input type="date" id="filterStartDate" class="form-control" onchange="applyFilters()">
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="fw-bold">তারিখ পর্যন্ত:</label>
+                    <input type="date" id="filterEndDate" class="form-control" onchange="applyFilters()">
+                </div>
+                <div class="col-6 col-md-2 text-center d-flex gap-1 no-print">
+                    <button onclick="resetFilters()" class="btn btn-outline-secondary btn-custom w-50" style="font-size: 12px;">রিসেট</button>
+                    <button onclick="window.print()" class="btn btn-dark btn-custom w-50" style="font-size: 12px;">🖨 প্রিন্ট</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- লেনদেনের বিবরণ টেবিল -->
+        <div class="card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="fw-bold text-secondary m-0" style="font-size: 15px;">লেনদেনের বিবরণী</h5>
+                <span id="recordCount" class="badge bg-dark px-2 py-1" style="font-size: 12px;">মোট রেকর্ড: 0</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead id="tableHeader"></thead>
+                    <tbody id="transactionTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ৩. সেটিংস মডাল -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light py-2">
+                    <h5 class="modal-title fw-bold text-primary" style="font-size: 15px;">⚙ ইউজার ও অ্যাডমিন সেটিংস</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-3">
+                    <h6 class="fw-bold text-dark mb-2" style="font-size: 13px;">আপনার প্রোফাইল আপডেট করুন</h6>
+                    <div class="mb-2">
+                        <label>নতুন ইউজারনেম</label>
+                        <input type="text" id="settingsNewUsername" class="form-control" placeholder="নতুন ইউজারনেম দিন">
+                    </div>
+                    <div class="mb-2">
+                        <label>বর্তমান পাসওয়ার্ড (নিশ্চিতকরণের জন্য)</label>
+                        <input type="password" id="settingsCurrentPass" class="form-control" placeholder="বর্তমান পাসওয়ার্ড দিন">
+                    </div>
+                    <div class="mb-3">
+                        <label>নতুন পাসওয়ার্ড (ঐচ্ছিক)</label>
+                        <input type="password" id="settingsNewPass" class="form-control" placeholder="নতুন পাসওয়ার্ড দিতে পারেন">
+                    </div>
+                    <button onclick="updateUserProfile()" class="btn btn-success btn-custom w-100 mb-2">প্রোফাইল আপডেট করুন</button>
+                    <div id="userUpdateMsg" class="text-center mb-2" style="font-size: 12px;"></div>
+
+                    <hr class="my-2">
+
+                    <div id="adminPermissionSection" style="display: none;">
+                        <h6 class="fw-bold text-danger mb-2" style="font-size: 13px;">🛡 ইউজার রোল পরিবর্তন করুন (অ্যাডমিন প্যানেল)</h6>
+                        <div class="mb-2">
+                            <label>ইউজার সিলেক্ট করুন</label>
+                            <select id="adminUserSelect" class="form-select">
+                                <option value="">ইউজার লোড হচ্ছে...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>নতুন রোল</label>
+                            <select id="adminNewRole" class="form-select">
+                                <option value="Admin">Admin (অ্যাডমিন)</option>
+                                <option value="User">User (সাধারণ ইউজার)</option>
+                            </select>
+                        </div>
+                        <button onclick="updateUserRoleByAdmin()" class="btn btn-danger btn-custom w-100">রোল পরিবর্তন করুন</button>
+                        <div id="adminUpdateMsg" class="text-center mt-1" style="font-size: 12px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript লজিক -->
+    <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx6ggkbrCkWoW2Zo2PrbYqi5LDqZRjE3nS-wEPbpM3LlcDbvxZA7mUdCizYpR2C28W08g/exec"; 
+
+        let allTransactions = [];
+        let currentUserRole = "";
+        let currentLoggedInUser = "";
+        let orgLatestData = {}; 
+
+        let inactivityTimer;
+        const INACTIVITY_LIMIT = 10 * 60 * 1000;
+
+        // হেল্পার ফাংশনসমূহ
+        function getId(item) {
+            return item['ID'] || item.id || "";
+        }
+        function getDate(item) {
+            return item['তারিখ'] || item.Date || item.date || "";
+        }
+        function getOrg(item) {
+            return item['প্রতিষ্ঠানের নাম'] || item.Organization || item.organization || "";
+        }
+        function getPerson(item) {
+            return item['গ্রহণ/প্রদানকারীর নাম'] || item.CustomerName || item.customerName || "";
+        }
+        function getMobile(item) {
+            let m = String(item['মোবাইল'] || item.Mobile || item.mobile || "").trim();
+            if (m.length === 10 && m.startsWith("1")) {
+                m = "0" + m;
+            }
+            return m;
+        }
+        function getAddress(item) {
+            return item['ঠিকানা'] || item.Address || item.address || "";
+        }
+        function getType(item) {
+            return String(item['Type'] || item.type || "").trim().toLowerCase();
+        }
+        function getAmount(item) {
+            return parseFloat(item['Blance'] || item['Balance'] || item.Amount || item.amount) || 0;
+        }
+        function getNote(item) {
+            return item['নোট/বিবরণ'] || item.Note || item.note || "";
+        }
+        function getEnteredBy(item) {
+            return item['EnteredBy'] || item['Mozammel'] || item.user || "অজানা";
+        }
+
+        function formatToBDDate(dateString) {
+            if (!dateString) return "";
+            let str = String(dateString).trim();
+            
+            if (str.includes("T") || (str.includes("-") && str.length > 10)) {
+                let d = new Date(str);
+                if (!isNaN(d.getTime())) {
+                    let day = String(d.getDate()).padStart(2, '0');
+                    let month = String(d.getMonth() + 1).padStart(2, '0');
+                    let year = d.getFullYear();
+                    return `${day}-${month}-${year}`;
+                }
+            }
+            
+            let parts = str.split("-");
+            if (parts.length === 3 && parts[0].length === 4) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            
+            return str;
+        }
+
+        function parseCustomDate(dateString) {
+            if (!dateString) return null;
+            let str = String(dateString).trim();
+            
+            let parts = str.split("-");
+            if (parts.length === 3 && parts[2].length === 4) {
+                return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            }
+
+            let d = new Date(str);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section.style.display === "none" || section.style.display === "") {
+                section.style.display = "block";
+            } else {
+                section.style.display = "none";
+            }
+        }
+
+        function resetInactivityTimer() {
+            if (currentUserRole) {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = setTimeout(() => {
+                    alert("দীর্ঘক্ষণ কোনো কার্যকলাপ না থাকায় আপনাকে স্বয়ংক্রিয়ভাবে লগআউট করা হয়েছে।");
+                    handleLogout();
+                }, INACTIVITY_LIMIT);
+            }
+        }
+
+        window.onload = function() {
+            let savedRole = sessionStorage.getItem("shopUserRole");
+            let savedUser = sessionStorage.getItem("shopUsername");
+            if (savedRole && savedUser) {
+                currentUserRole = savedRole;
+                currentLoggedInUser = savedUser;
+                showDashboard();
+                fetchData();
+                setupInactivityListeners();
+            } else {
+                showLogin();
+            }
+        };
+
+        function setupInactivityListeners() {
+            window.addEventListener('mousemove', resetInactivityTimer);
+            window.addEventListener('mousedown', resetInactivityTimer);
+            window.addEventListener('keypress', resetInactivityTimer);
+            window.addEventListener('scroll', resetInactivityTimer);
+            window.addEventListener('touchstart', resetInactivityTimer);
+            resetInactivityTimer();
+        }
+
+        function handleLogin() {
+            let user = document.getElementById('loginUser').value.trim();
+            let pass = document.getElementById('loginPass').value.trim();
+            let errorDiv = document.getElementById('loginError');
+
+            if (!user || !pass) {
+                errorDiv.innerText = "দয়া করে ইউজারনেম এবং পাসওয়ার্ড দিন!";
+                return;
+            }
+
+            fetch(`${WEB_APP_URL}?action=checkLogin&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === "success") {
+                        currentUserRole = res.role;
+                        currentLoggedInUser = user;
+                        
+                        sessionStorage.setItem("shopUserRole", currentUserRole);
+                        sessionStorage.setItem("shopUsername", currentLoggedInUser);
+                        
+                        showDashboard();
+                        fetchData();
+                        setupInactivityListeners();
+                    } else {
+                        errorDiv.innerText = res.message || "ভুল ইউজারনেম বা পাসওয়ার্ড!";
+                    }
+                })
+                .catch(err => { errorDiv.innerText = "সার্ভার কানেকশনে সমস্যা!"; });
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem("shopUserRole");
+            sessionStorage.removeItem("shopUsername");
+            showLogin();
+        }
+
+        // লগইন সফল হলে শুধু ড্যাশবোর্ড দেখাবে, লগইন পেজ লুকিয়ে যাবে
+        function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+
+            document.getElementById('userRoleBadge').innerText = "ইউজার: " + currentLoggedInUser + " (" + currentUserRole + ")";
+            
+            let today = new Date().toISOString().split('T')[0];
+            let txnDateInput = document.getElementById('txnDate');
+            if(txnDateInput && !txnDateInput.value) {
+                txnDateInput.value = today;
+            }
+        }
+
+        // লগআউট করলে বা সেশন না থাকলে শুধু লগইন পেজ দেখাবে, ড্যাশবোর্ড লুকিয়ে যাবে
+        function showLogin() {
+            currentUserRole = "";
+            currentLoggedInUser = "";
+            
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'flex';
+
+            document.getElementById('loginUser').value = "";
+            document.getElementById('loginPass').value = "";
+            document.getElementById('loginError').innerText = "";
+        }
+
+        function fetchData() {
+            fetch(WEB_APP_URL + "?action=getData")
+                .then(res => res.json())
+                .then(response => {
+                    if (response.status === "success") {
+                        allTransactions = response.data;
+                        processOrgDirectory(allTransactions);
+                        populateOrgFilter(allTransactions);
+                        populateYearFilter(allTransactions);
+                        populateDatalists(allTransactions);
+                        applyFilters(); 
+                    }
+                })
+                .catch(err => console.error("Error:", err));
+        }
+
+        function processOrgDirectory(dataList) {
+            orgLatestData = {};
+            dataList.forEach(item => {
+                let org = getOrg(item);
+                if (org) {
+                    orgLatestData[org] = {
+                        mobile: getMobile(item),
+                        address: getAddress(item)
+                    };
+                }
+            });
+        }
+
+        function onOrgSelect() {
+            let typedOrg = document.getElementById('organizationName').value.trim();
+            if (orgLatestData[typedOrg]) {
+                document.getElementById('mobile').value = orgLatestData[typedOrg].mobile || "";
+                document.getElementById('address').value = orgLatestData[typedOrg].address || "";
+            }
+        }
+
+        function calculateSummary(dataList) {
+            let totalGiven = 0;
+            let totalGot = 0;
+
+            dataList.forEach(item => {
+                let amt = getAmount(item);
+                let type = getType(item);
+
+                if (type === 'given' || type.includes('দিলাম')) {
+                    totalGiven += amt;
+                } else if (type === 'got' || type.includes('পেলাম')) {
+                    totalGot += amt;
+                }
+            });
+
+            let diff = totalGot - totalGiven;
+            let netDisplay = document.getElementById('netBalanceDisplay');
+            let netTitle = document.getElementById('netBalanceTitle');
+
+            document.getElementById('totalGivenDisplay').innerText = "৳ " + totalGiven.toLocaleString();
+            document.getElementById('totalGotDisplay').innerText = "৳ " + totalGot.toLocaleString();
+            
+            if (diff > 0) {
+                netTitle.innerText = "অতিরিক্ত (Extra):";
+                netDisplay.innerText = "৳ " + diff.toLocaleString();
+                netDisplay.className = "summary-value text-success";
+            } else if (diff < 0) {
+                netTitle.innerText = "পাওনা (Due):";
+                netDisplay.innerText = "৳ " + Math.abs(diff).toLocaleString();
+                netDisplay.className = "summary-value text-danger";
+            } else {
+                netTitle.innerText = "নিট ব্যালেন্স:";
+                netDisplay.innerText = "৳ 0";
+                netDisplay.className = "summary-value text-primary";
+            }
+        }
+
+        function displayData(dataList) {
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('transactionTableBody');
+            
+            thead.innerHTML = "";
+            tbody.innerHTML = "";
+            document.getElementById('recordCount').innerText = "মোট রেকর্ড: " + dataList.length;
+
+            if (dataList.length === 0) {
+                thead.innerHTML = `<tr><th>তথ্য</th></tr>`;
+                tbody.innerHTML = `<tr><td class="text-center py-3 text-muted">কোনো লেনদেন পাওয়া যায়নি</td></tr>`;
+                return;
+            }
+
+            let isGeneralUser = (currentUserRole.toLowerCase() === 'user' || currentUserRole.toLowerCase() === 'সাধারণ ইউজার');
+
+            let headerTR = document.createElement('tr');
+            headerTR.innerHTML = `
+                <th class="date-column">তারিখ</th>
+                <th class="text-start-custom">প্রতিষ্ঠানের নাম</th>
+                <th class="text-start-custom">গ্রাহকের নাম</th>
+                <th>মোবাইল</th>
+                <th class="text-start-custom">ঠিকানা</th>
+                <th>ধরন</th>
+                <th class="text-start-custom">নোট/বিবরণ</th>
+                <th>পরিমাণ</th>
+                <th>এন্ট্রিধারী</th>
+            `;
+            if (!isGeneralUser) {
+                headerTR.innerHTML += `<th class="action-col">অ্যাকশন</th>`;
+            }
+            thead.appendChild(headerTR);
+
+            dataList.forEach(item => {
+                let typeVal = getType(item);
+                let isGiven = (typeVal === 'given' || typeVal.includes('দিলাম'));
+                
+                let badgeClass = isGiven ? "badge-given" : "badge-got";
+                let typeText = isGiven ? "প্রদান" : "গ্রহণ";
+                let amountVal = getAmount(item);
+                let enteredBy = getEnteredBy(item);
+                
+                let rawDate = getDate(item);
+                let formattedDate = formatToBDDate(rawDate);
+
+                let orgName = getOrg(item);
+                let personName = getPerson(item);
+                let itemMobile = getMobile(item);
+                let itemAddress = getAddress(item);
+                let itemNote = getNote(item);
+                let itemId = getId(item);
+
+                let actionTD = '';
+                if (!isGeneralUser) {
+                    actionTD = `
+                        <td class="text-center action-col">
+                            <button class="btn btn-sm btn-warning py-0 px-2 me-1" style="font-size:12px;" onclick='editItem(${JSON.stringify(item)})'>✏</button>
+                            <button class="btn btn-sm btn-danger py-0 px-2" style="font-size:12px;" onclick='deleteItem("${itemId}")'>🗑</button>
+                        </td>
+                    `;
+                }
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="date-column">${formattedDate}</td>
+                    <td class="text-start-custom fw-bold text-primary">${orgName}</td>
+                    <td class="text-start-custom">${personName}</td>
+                    <td>${itemMobile}</td>
+                    <td class="text-start-custom">${itemAddress}</td>
+                    <td><span class="badge ${badgeClass}">${typeText}</span></td>
+                    <td class="text-start-custom note-column">${itemNote}</td>
+                    <td>৳ ${amountVal.toLocaleString()}</td>
+                    <td><span class="badge bg-light text-dark border">${enteredBy}</span></td>
+                    ${!isGeneralUser ? actionTD : ''}
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function populateOrgFilter(dataList) {
+            const filterSelect = document.getElementById('filterOrg');
+            let orgs = new Set();
+            
+            dataList.forEach(item => {
+                let org = getOrg(item);
+                if(org) orgs.add(org);
+            });
+
+            filterSelect.innerHTML = `<option value="all">সকল প্রতিষ্ঠান</option>`;
+            orgs.forEach(org => {
+                filterSelect.innerHTML += `<option value="${org}">${org}</option>`;
+            });
+        }
+
+        function populateYearFilter(dataList) {
+            const yearSelect = document.getElementById('filterYear');
+            let years = new Set();
+
+            dataList.forEach(item => {
+                let rawDate = getDate(item);
+                let itemDate = parseCustomDate(rawDate);
+                if (itemDate && !isNaN(itemDate.getTime())) {
+                    years.add(itemDate.getFullYear());
+                }
+            });
+
+            let sortedYears = Array.from(years).sort((a, b) => b - a);
+            yearSelect.innerHTML = `<option value="all">সকল বছর</option>`;
+            sortedYears.forEach(yr => {
+                yearSelect.innerHTML += `<option value="${yr}">${yr}</option>`;
+            });
+        }
+
+        function populateDatalists(dataList) {
+            const orgDatalist = document.getElementById('orgListOptions');
+            const custDatalist = document.getElementById('customerListOptions');
+            let orgs = new Set();
+            let persons = new Set();
+            
+            dataList.forEach(item => {
+                let org = getOrg(item);
+                let person = getPerson(item);
+                
+                if (org) orgs.add(org);
+                if (person) persons.add(person);
+            });
+            
+            orgDatalist.innerHTML = "";
+            orgs.forEach(org => {
+                orgDatalist.innerHTML += `<option value="${org}">`;
+            });
+
+            custDatalist.innerHTML = "";
+            persons.forEach(p => {
+                custDatalist.innerHTML += `<option value="${p}">`;
+            });
+        }
+
+        function applyFilters() {
+            let selectedOrg = document.getElementById('filterOrg').value;
+            let selectedYear = document.getElementById('filterYear').value;
+            let selectedMonth = document.getElementById('filterMonth').value;
+            let startDate = document.getElementById('filterStartDate').value;
+            let endDate = document.getElementById('filterEndDate').value;
+
+            let filtered = allTransactions.filter(item => {
+                let itemOrg = getOrg(item);
+                let matchOrg = (selectedOrg === "all" || itemOrg === selectedOrg);
+                
+                let rawDate = getDate(item);
+                let itemDate = parseCustomDate(rawDate);
+                
+                let matchYear = true;
+                if (selectedYear !== "all" && itemDate) {
+                    if (String(itemDate.getFullYear()) !== String(selectedYear)) {
+                        matchYear = false;
+                    }
+                } else if (selectedYear !== "all" && !itemDate) {
+                    matchYear = false;
+                }
+
+                let matchMonth = true;
+                if (selectedMonth !== "all" && itemDate) {
+                    let itemMonthStr = String(itemDate.getMonth() + 1).padStart(2, '0');
+                    if (itemMonthStr !== selectedMonth) {
+                        matchMonth = false;
+                    }
+                } else if (selectedMonth !== "all" && !itemDate) {
+                    matchMonth = false;
+                }
+
+                let matchDate = true;
+                if ((startDate || endDate) && itemDate) {
+                    let itemTime = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()).getTime();
+                    
+                    if (startDate) {
+                        let sd = new Date(startDate);
+                        let startTime = new Date(sd.getFullYear(), sd.getMonth(), sd.getDate()).getTime();
+                        if (itemTime < startTime) matchDate = false;
+                    }
+                    if (endDate) {
+                        let ed = new Date(endDate);
+                        let endTime = new Date(ed.getFullYear(), ed.getMonth(), ed.getDate()).getTime();
+                        if (itemTime > endTime) matchDate = false;
+                    }
+                } else if ((startDate || endDate) && !itemDate) {
+                    matchDate = false;
+                }
+
+                return matchOrg && matchYear && matchMonth && matchDate;
+            });
+
+            displayData(filtered);
+            calculateSummary(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('filterOrg').value = "all";
+            document.getElementById('filterYear').value = "all";
+            document.getElementById('filterMonth').value = "all";
+            document.getElementById('filterStartDate').value = "";
+            document.getElementById('filterEndDate').value = "";
+            applyFilters();
+        }
+
+        document.getElementById('transactionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let id = document.getElementById('editId').value;
+            let txnDate = document.getElementById('txnDate').value; 
+            let organizationName = document.getElementById('organizationName').value.trim();
+            let customerName = document.getElementById('customerName').value.trim();
+            let mobile = document.getElementById('mobile').value.trim();
+            let address = document.getElementById('address').value.trim();
+            let type = document.getElementById('transactionType').value;
+            let amount = document.getElementById('amount').value;
+            let note = document.getElementById('note').value.trim();
+
+            if (!txnDate || !organizationName || !customerName || !amount) {
+                alert("দয়া করে তারিখ, প্রতিষ্ঠান, গ্রাহকের নাম এবং পরিমাণ পূরণ করুন!");
+                return;
+            }
+
+            let payload = {
+                action: id ? "updateTransaction" : "addTransaction",
+                id: id,
+                date: txnDate,
+                organization: organizationName,
+                customerName: customerName,
+                mobile: mobile,
+                address: address,
+                type: type,
+                amount: amount,
+                note: note,
+                username: currentLoggedInUser,
+                role: currentUserRole
+            };
+
+            let saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerText = "সংরক্ষণ হচ্ছে...";
+            saveBtn.disabled = true;
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                saveBtn.innerText = "সেভ করুন";
+                saveBtn.disabled = false;
+
+                if (res.status === "success") {
+                    document.getElementById('transactionForm').reset();
+                    cancelEditMode();
+                    
+                    let today = new Date().toISOString().split('T')[0];
+                    document.getElementById('txnDate').value = today;
+                    
+                    fetchData(); 
+                } else {
+                    alert("ত্রুটি: " + res.message);
+                }
+            })
+            .catch(err => {
+                saveBtn.innerText = "সেভ করুন";
+                saveBtn.disabled = false;
+                alert("সার্ভার সংযোগে সমস্যা হয়েছে!");
+            });
+        });
+
+        function editItem(item) {
+            document.getElementById('transactionFormCard').style.display = 'block';
+
+            document.getElementById('editId').value = getId(item);
+            
+            let rawDate = getDate(item);
+            let parts = String(rawDate).trim().split("-");
+            if (parts.length === 3 && parts[2].length === 4) {
+                document.getElementById('txnDate').value = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            } else if(rawDate) {
+                let dObj = new Date(rawDate);
+                if(!isNaN(dObj.getTime())) {
+                    document.getElementById('txnDate').value = dObj.toISOString().split('T')[0];
+                }
+            }
+
+            document.getElementById('organizationName').value = getOrg(item);
+            document.getElementById('customerName').value = getPerson(item);
+            document.getElementById('mobile').value = getMobile(item);
+            document.getElementById('address').value = getAddress(item);
+            
+            let typeVal = getType(item);
+            document.getElementById('transactionType').value = (typeVal === 'given' || typeVal.includes('দিলাম')) ? 'given' : 'got';
+            
+            document.getElementById('amount').value = getAmount(item);
+            document.getElementById('note').value = getNote(item);
+
+            document.getElementById('formTitle').innerText = "✏ লেনদেন আপডেট করুন";
+            document.getElementById('saveBtn').innerText = "আপডেট করুন";
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEditMode() {
+            document.getElementById('editId').value = "";
+            document.getElementById('transactionForm').reset();
+            
+            let today = new Date().toISOString().split('T')[0];
+            document.getElementById('txnDate').value = today;
+
+            document.getElementById('formTitle').innerText = "➕ নতুন লেনদেন যোগ করুন";
+            document.getElementById('saveBtn').innerText = "সেভ করুন";
+            
+            document.getElementById('transactionFormCard').style.display = 'none';
+        }
+
+        function deleteItem(id) {
+            if (confirm("আপনি কি নিশ্চিতভাবে এই রেকর্ডটি ডিলিট করতে চান?")) {
+                let payload = {
+                    action: "deleteTransaction",
+                    id: id
+                };
+
+                fetch(WEB_APP_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === "success") {
+                        fetchData();
+                    } else {
+                        alert("ডিলিট করতে সমস্যা হয়েছে: " + res.message);
+                    }
+                })
+                .catch(err => alert("সার্ভার কানেকশনে সমস্যা!"));
+            }
+        }
+
+        function openSettingsModal() {
+            document.getElementById('settingsNewUsername').value = currentLoggedInUser;
+            document.getElementById('settingsCurrentPass').value = "";
+            document.getElementById('settingsNewPass').value = "";
+            document.getElementById('userUpdateMsg').innerText = "";
+            document.getElementById('adminUpdateMsg').innerText = "";
+
+            let adminSec = document.getElementById('adminPermissionSection');
+            if (currentUserRole.toLowerCase() === 'admin' || currentUserRole.toLowerCase() === 'অ্যাডমিন') {
+                adminSec.style.display = "block";
+                loadAllUsersForAdmin();
+            } else {
+                adminSec.style.display = "none";
+            }
+
+            let myModal = new bootstrap.Modal(document.getElementById('settingsModal'));
+            myModal.show();
+        }
+
+        function updateUserProfile() {
+            let newUsername = document.getElementById('settingsNewUsername').value.trim();
+            let currentPass = document.getElementById('settingsCurrentPass').value.trim();
+            let newPass = document.getElementById('settingsNewPass').value.trim();
+            let msgDiv = document.getElementById('userUpdateMsg');
+
+            if (!newUsername || !currentPass) {
+                msgDiv.className = "text-danger text-center mb-2";
+                msgDiv.innerText = "নতুন ইউজারনেম এবং বর্তমান পাসওয়ার্ড দেওয়া বাধ্যতামূলক!";
+                return;
+            }
+
+            let payload = {
+                action: "updateUserProfile",
+                oldUsername: currentLoggedInUser,
+                newUsername: newUsername,
+                currentPassword: currentPass,
+                newPassword: newPass
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === "success") {
+                    msgDiv.className = "text-success text-center mb-2";
+                    msgDiv.innerText = "প্রোফাইল সফলভাবে আপডেট হয়েছে! পুনরায় লগইন করুন...";
+                    setTimeout(() => { handleLogout(); }, 1500);
+                } else {
+                    msgDiv.className = "text-danger text-center mb-2";
+                    msgDiv.innerText = res.message || "আপডেট করতে সমস্যা হয়েছে!";
+                }
+            })
+            .catch(err => {
+                msgDiv.className = "text-danger text-center mb-2";
+                msgDiv.innerText = "সার্ভার সংযোগে সমস্যা হয়েছে!";
+            });
+        }
+
+        function loadAllUsersForAdmin() {
+            fetch(`${WEB_APP_URL}?action=getAllUsers`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === "success") {
+                        let select = document.getElementById('adminUserSelect');
+                        select.innerHTML = "";
+                        res.users.forEach(u => {
+                            select.innerHTML += `<option value="${u.username}">${u.username} (${u.role})</option>`;
+                        });
+                    }
+                })
+                .catch(err => console.error("Error loading users:", err));
+        }
+
+        function updateUserRoleByAdmin() {
+            let targetUser = document.getElementById('adminUserSelect').value;
+            let newRole = document.getElementById('adminNewRole').value;
+            let msgDiv = document.getElementById('adminUpdateMsg');
+
+            if (!targetUser) {
+                msgDiv.className = "text-danger";
+                msgDiv.innerText = "কোনো ইউজার সিলেক্ট করা হয়নি!";
+                return;
+            }
+
+            let payload = {
+                action: "updateUserRole",
+                adminUsername: currentLoggedInUser,
+                targetUsername: targetUser,
+                newRole: newRole
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === "success") {
+                    msgDiv.className = "text-success";
+                    msgDiv.innerText = "রোলের অনুমতি সফলভাবে পরিবর্তন করা হয়েছে!";
+                    loadAllUsersForAdmin();
+                } else {
+                    msgDiv.className = "text-danger";
+                    msgDiv.innerText = res.message || "রোল পরিবর্তনে সমস্যা হয়েছে!";
+                }
+            })
+            .catch(err => {
+                msgDiv.className = "text-danger";
+                msgDiv.innerText = "সার্ভার সংযোগে সমস্যা হয়েছে!";
+            });
+        }
+    </script>
+</body>
+</html>
