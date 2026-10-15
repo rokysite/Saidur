@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>গ্রামীণ চিকিৎসালয়</title>
+    <title>গ্রামীণ চিকিৎসালয়</title>
     <!-- Bootstrap 5.3 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Font -->
@@ -213,12 +213,6 @@
             min-width: 180px;
         }
 
-        @media (min-width: 992px) {
-            table th, table td {
-                padding: 5px 8px !important;
-            }
-        }
-
         table td.text-start-custom, table th.text-start-custom {
             text-align: left !important;
         }
@@ -268,7 +262,6 @@
             white-space: nowrap;
         }
 
-        /* সেকশন দৃশ্যমানতা নিয়ন্ত্রণ */
         #loginSection {
             display: flex;
             min-height: 70vh !important;
@@ -279,7 +272,6 @@
             display: none;
         }
 
-        /* প্রিন্ট সেকশন */
         @media print {
             @page {
                 size: A4 landscape;
@@ -380,7 +372,7 @@
         
         <!-- হেডার সেকশন -->
         <div class="header-container">
-            <h2 class="page-title">🏪 গ্রামীণ চিকিৎসালয় ক্যাশ খাতা ম্যানেজমেন্ট</h2>
+            <h2 class="page-title">🏪 গ্রামীণ চিকিৎসালয় ক্যাশ খাতা ম্যানেজমেন্ট</h2>
             <div class="header-actions">
                 <span id="userRoleBadge" class="badge bg-secondary px-2 py-1" style="font-size: 12px;">রোল</span>
                 <button onclick="openSettingsModal()" class="btn btn-outline-dark btn-sm fw-bold px-2 py-1" style="height: 28px; font-size: 12px;">⚙ সেটিংস</button>
@@ -558,23 +550,42 @@
 
                     <hr class="my-2">
 
+                    <!-- অ্যাডমিন ইউজার ম্যানেজমেন্ট সেকশন -->
                     <div id="adminPermissionSection" style="display: none;">
-                        <h6 class="fw-bold text-danger mb-2" style="font-size: 13px;">🛡 ইউজার রোল পরিবর্তন করুন (অ্যাডমিন প্যানেল)</h6>
-                        <div class="mb-2">
-                            <label>ইউজার সিলেক্ট করুন</label>
-                            <select id="adminUserSelect" class="form-select">
-                                <option value="">ইউজার লোড হচ্ছে...</option>
-                            </select>
+                        <h6 class="fw-bold text-danger mb-2" style="font-size: 13px;">🛡 ইউজার ম্যানেজমেন্ট (অ্যাডমিন প্যানেল)</h6>
+                        
+                        <!-- নতুন ইউজার তৈরির ফর্ম -->
+                        <div class="card p-2 bg-light mb-3 border">
+                            <span class="fw-bold text-primary mb-1" style="font-size: 12px;">➕ নতুন ইউজার তৈরি করুন</span>
+                            <div class="mb-1">
+                                <input type="text" id="adminNewUsername" class="form-control form-control-sm mb-1" placeholder="নতুন ইউজারনেম">
+                                <input type="password" id="adminNewPassword" class="form-control form-control-sm mb-1" placeholder="পাসওয়ার্ড">
+                                <select id="adminNewRole" class="form-select form-select-sm mb-1">
+                                    <option value="user">User (সাধারণ ইউজার)</option>
+                                    <option value="Admin">Admin (অ্যাডমিন)</option>
+                                </select>
+                            </div>
+                            <button onclick="handleAddNewUser()" class="btn btn-primary btn-sm w-100 fw-bold" style="font-size: 12px;">ইউজার তৈরি করুন</button>
+                            <div id="addUserMsg" class="text-center mt-1" style="font-size: 11px;"></div>
                         </div>
-                        <div class="mb-3">
-                            <label>নতুন রোল</label>
-                            <select id="adminNewRole" class="form-select">
-                                <option value="Admin">Admin (অ্যাডমিন)</option>
-                                <option value="User">User (সাধারণ ইউজার)</option>
-                            </select>
+
+                        <!-- ইউজার লিস্ট ও এডিট/ডিলিট টেবিল -->
+                        <span class="fw-bold text-dark mb-1 d-block" style="font-size: 12px;">📋 বিদ্যমান ইউজার তালিকা ও অ্যাকশন</span>
+                        <div class="table-responsive" style="max-height: 200px;">
+                            <table class="table table-bordered table-sm mb-0 align-middle text-center" style="font-size: 11px;">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ইউজারনেম</th>
+                                        <th>রোল</th>
+                                        <th>অ্যাকশন</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminUserTableBody">
+                                    <!-- ডাইনামিকালি লোড হবে -->
+                                </tbody>
+                            </table>
                         </div>
-                        <button onclick="updateUserRoleByAdmin()" class="btn btn-danger btn-custom w-100">রোল পরিবর্তন করুন</button>
-                        <div id="adminUpdateMsg" class="text-center mt-1" style="font-size: 12px;"></div>
+                        <div id="adminTableMsg" class="text-center mt-1" style="font-size: 11px;"></div>
                     </div>
                 </div>
             </div>
@@ -745,7 +756,6 @@
             showLogin();
         }
 
-        // লগইন সফল হলে শুধু ড্যাশবোর্ড দেখাবে, লগইন পেজ লুকিয়ে যাবে
         function showDashboard() {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
@@ -759,7 +769,6 @@
             }
         }
 
-        // লগআউট করলে বা সেশন না থাকলে শুধু লগইন পেজ দেখাবে, ড্যাশবোর্ড লুকিয়ে যাবে
         function showLogin() {
             currentUserRole = "";
             currentLoggedInUser = "";
@@ -1190,7 +1199,8 @@
             document.getElementById('settingsCurrentPass').value = "";
             document.getElementById('settingsNewPass').value = "";
             document.getElementById('userUpdateMsg').innerText = "";
-            document.getElementById('adminUpdateMsg').innerText = "";
+            document.getElementById('addUserMsg').innerText = "";
+            document.getElementById('adminTableMsg').innerText = "";
 
             let adminSec = document.getElementById('adminPermissionSection');
             if (currentUserRole.toLowerCase() === 'admin' || currentUserRole.toLowerCase() === 'অ্যাডমিন') {
@@ -1202,6 +1212,125 @@
 
             let myModal = new bootstrap.Modal(document.getElementById('settingsModal'));
             myModal.show();
+        }
+
+        // অ্যাডমিন প্যানেলের জন্য সকল ইউজার ফেচ করে টেবিলে দেখানো
+        function loadAllUsersForAdmin() {
+            fetch(`${WEB_APP_URL}?action=getUsers`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === "success") {
+                        let tbody = document.getElementById('adminUserTableBody');
+                        tbody.innerHTML = "";
+                        res.users.forEach(u => {
+                            let tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td class="fw-bold">${u.username}</td>
+                                <td><span class="badge bg-secondary">${u.role}</span></td>
+                                <td class="action-col">
+                                    <button onclick="editUserPrompt('${u.username}', '${u.role}')" class="btn btn-warning btn-sm py-0 px-1 me-1" style="font-size: 10px;">এডিট</button>
+                                    <button onclick="deleteUserAction('${u.username}')" class="btn btn-danger btn-sm py-0 px-1" style="font-size: 10px;">ডিলিট</button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                })
+                .catch(err => console.error("Error loading users:", err));
+        }
+
+        // নতুন ইউজার তৈরি করার ফাংশন
+        function handleAddNewUser() {
+            let newU = document.getElementById('adminNewUsername').value.trim();
+            let newP = document.getElementById('adminNewPassword').value.trim();
+            let newR = document.getElementById('adminNewRole').value;
+            let msgDiv = document.getElementById('addUserMsg');
+
+            if (!newU || !newP) {
+                msgDiv.className = "text-danger text-center mt-1";
+                msgDiv.innerText = "ইউজারনেম এবং পাসওয়ার্ড উভয়ই দিতে হবে!";
+                return;
+            }
+
+            let payload = {
+                action: "addUser",
+                username: currentLoggedInUser,
+                newUsername: newU,
+                newPassword: newP,
+                newRole: newR
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                msgDiv.className = res.status === 'success' ? "text-success text-center mt-1" : "text-danger text-center mt-1";
+                msgDiv.innerText = res.message;
+                if (res.status === 'success') {
+                    document.getElementById('adminNewUsername').value = '';
+                    document.getElementById('adminNewPassword').value = '';
+                    loadAllUsersForAdmin();
+                }
+            })
+            .catch(err => {
+                msgDiv.className = "text-danger text-center mt-1";
+                msgDiv.innerText = "সার্ভার সংযোগে সমস্যা হয়েছে!";
+            });
+        }
+
+        // ইউজার এডিট করার ফাংশন (পাসওয়ার্ড বা রোল পরিবর্তন)
+        function editUserPrompt(username, currentRole) {
+            let newPass = prompt(username + " এর জন্য নতুন পাসওয়ার্ড দিন (পাসওয়ার্ড পরিবর্তন না করতে চাইলে খালি রাখুন):");
+            let newRole = prompt("নতুন রোল দিন (Admin অথবা user):", currentRole);
+
+            if (newRole === null) return; // ক্যানসেল করলে
+
+            let payload = {
+                action: "updateUser",
+                username: currentLoggedInUser,
+                targetUsername: username,
+                newPassword: newPass ? newPass.trim() : "",
+                newRole: newRole.trim()
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert(res.message);
+                if (res.status === 'success') {
+                    loadAllUsersForAdmin();
+                }
+            })
+            .catch(err => alert("সার্ভার সংযোগে সমস্যা হয়েছে!"));
+        }
+
+        // ইউজার ডিলিট করার ফাংশন
+        function deleteUserAction(username) {
+            if (!confirm("আপনি কি নিশ্চিতভাবে এই ইউজারটি ডিলিট করতে চান? (" + username + ")")) return;
+
+            let payload = {
+                action: "deleteUser",
+                username: currentLoggedInUser,
+                targetUsername: username
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert(res.message);
+                if (res.status === 'success') {
+                    loadAllUsersForAdmin();
+                }
+            })
+            .catch(err => alert("সার্ভার সংযোগে সমস্যা হয়েছে!"));
         }
 
         function updateUserProfile() {
@@ -1241,60 +1370,6 @@
             })
             .catch(err => {
                 msgDiv.className = "text-danger text-center mb-2";
-                msgDiv.innerText = "সার্ভার সংযোগে সমস্যা হয়েছে!";
-            });
-        }
-
-        function loadAllUsersForAdmin() {
-            fetch(`${WEB_APP_URL}?action=getAllUsers`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.status === "success") {
-                        let select = document.getElementById('adminUserSelect');
-                        select.innerHTML = "";
-                        res.users.forEach(u => {
-                            select.innerHTML += `<option value="${u.username}">${u.username} (${u.role})</option>`;
-                        });
-                    }
-                })
-                .catch(err => console.error("Error loading users:", err));
-        }
-
-        function updateUserRoleByAdmin() {
-            let targetUser = document.getElementById('adminUserSelect').value;
-            let newRole = document.getElementById('adminNewRole').value;
-            let msgDiv = document.getElementById('adminUpdateMsg');
-
-            if (!targetUser) {
-                msgDiv.className = "text-danger";
-                msgDiv.innerText = "কোনো ইউজার সিলেক্ট করা হয়নি!";
-                return;
-            }
-
-            let payload = {
-                action: "updateUserRole",
-                adminUsername: currentLoggedInUser,
-                targetUsername: targetUser,
-                newRole: newRole
-            };
-
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.status === "success") {
-                    msgDiv.className = "text-success";
-                    msgDiv.innerText = "রোলের অনুমতি সফলভাবে পরিবর্তন করা হয়েছে!";
-                    loadAllUsersForAdmin();
-                } else {
-                    msgDiv.className = "text-danger";
-                    msgDiv.innerText = res.message || "রোল পরিবর্তনে সমস্যা হয়েছে!";
-                }
-            })
-            .catch(err => {
-                msgDiv.className = "text-danger";
                 msgDiv.innerText = "সার্ভার সংযোগে সমস্যা হয়েছে!";
             });
         }
