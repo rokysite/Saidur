@@ -213,6 +213,12 @@
             min-width: 180px;
         }
 
+        @media (min-width: 992px) {
+            table th, table td {
+                padding: 5px 8px !important;
+            }
+        }
+
         table td.text-start-custom, table th.text-start-custom {
             text-align: left !important;
         }
@@ -262,6 +268,7 @@
             white-space: nowrap;
         }
 
+        /* সেকশন দৃশ্যমানতা নিয়ন্ত্রণ */
         #loginSection {
             display: flex;
             min-height: 70vh !important;
@@ -272,6 +279,7 @@
             display: none;
         }
 
+        /* প্রিন্ট সেকশন */
         @media print {
             @page {
                 size: A4 landscape;
@@ -550,7 +558,6 @@
 
                     <hr class="my-2">
 
-                    <!-- অ্যাডমিন ইউজার ম্যানেজমেন্ট সেকশন -->
                     <div id="adminPermissionSection" style="display: none;">
                         <h6 class="fw-bold text-danger mb-2" style="font-size: 13px;">🛡 ইউজার ম্যানেজমেন্ট (অ্যাডমিন প্যানেল)</h6>
                         
@@ -558,7 +565,7 @@
                         <div class="card p-2 bg-light mb-3 border">
                             <span class="fw-bold text-primary mb-1" style="font-size: 12px;">➕ নতুন ইউজার তৈরি করুন</span>
                             <div class="mb-1">
-                                <input type="text" id="adminNewUsername" class="form-control form-control-sm mb-1" placeholder="নতুন ইউজারনেম">
+                                <input type="text" id="adminNewUsername" class="form-control form-control-sm mb-1" placeholder="ইউজারনেম">
                                 <input type="password" id="adminNewPassword" class="form-control form-control-sm mb-1" placeholder="পাসওয়ার্ড">
                                 <select id="adminNewRole" class="form-select form-select-sm mb-1">
                                     <option value="user">User (সাধারণ ইউজার)</option>
@@ -569,8 +576,8 @@
                             <div id="addUserMsg" class="text-center mt-1" style="font-size: 11px;"></div>
                         </div>
 
-                        <!-- ইউজার লিস্ট ও এডিট/ডিলিট টেবিল -->
-                        <span class="fw-bold text-dark mb-1 d-block" style="font-size: 12px;">📋 বিদ্যমান ইউজার তালিকা ও অ্যাকশন</span>
+                        <!-- বিদ্যমান ইউজার লিস্ট ও রোল পরিবর্তন / ডিলিট -->
+                        <span class="fw-bold text-dark mb-1 d-block" style="font-size: 12px;">📋 ইউজার তালিকা ও রোল পরিবর্তন</span>
                         <div class="table-responsive" style="max-height: 200px;">
                             <table class="table table-bordered table-sm mb-0 align-middle text-center" style="font-size: 11px;">
                                 <thead class="table-dark">
@@ -585,7 +592,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div id="adminTableMsg" class="text-center mt-1" style="font-size: 11px;"></div>
+                        <div id="adminUpdateMsg" class="text-center mt-1" style="font-size: 12px;"></div>
                     </div>
                 </div>
             </div>
@@ -597,7 +604,7 @@
 
     <!-- JavaScript লজিক -->
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzryiqj7pt_9I9pYb-v2zhFS9TanGchEU--jE_hxcgKjFGx9GaTPfNH10EYXOCkgc3w/exec"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyCxbWVFc0i6dz4U5yCX76YOyhcEaHgANwgojlT22yBSb5bx-peHy_zFbwSakmiNuOZ/exec"; 
 
         let allTransactions = [];
         let currentUserRole = "";
@@ -1199,8 +1206,7 @@
             document.getElementById('settingsCurrentPass').value = "";
             document.getElementById('settingsNewPass').value = "";
             document.getElementById('userUpdateMsg').innerText = "";
-            document.getElementById('addUserMsg').innerText = "";
-            document.getElementById('adminTableMsg').innerText = "";
+            document.getElementById('adminUpdateMsg').innerText = "";
 
             let adminSec = document.getElementById('adminPermissionSection');
             if (currentUserRole.toLowerCase() === 'admin' || currentUserRole.toLowerCase() === 'অ্যাডমিন') {
@@ -1212,125 +1218,6 @@
 
             let myModal = new bootstrap.Modal(document.getElementById('settingsModal'));
             myModal.show();
-        }
-
-        // অ্যাডমিন প্যানেলের জন্য সকল ইউজার ফেচ করে টেবিলে দেখানো
-        function loadAllUsersForAdmin() {
-            fetch(`${WEB_APP_URL}?action=getUsers`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.status === "success") {
-                        let tbody = document.getElementById('adminUserTableBody');
-                        tbody.innerHTML = "";
-                        res.users.forEach(u => {
-                            let tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td class="fw-bold">${u.username}</td>
-                                <td><span class="badge bg-secondary">${u.role}</span></td>
-                                <td class="action-col">
-                                    <button onclick="editUserPrompt('${u.username}', '${u.role}')" class="btn btn-warning btn-sm py-0 px-1 me-1" style="font-size: 10px;">এডিট</button>
-                                    <button onclick="deleteUserAction('${u.username}')" class="btn btn-danger btn-sm py-0 px-1" style="font-size: 10px;">ডিলিট</button>
-                                </td>
-                            `;
-                            tbody.appendChild(tr);
-                        });
-                    }
-                })
-                .catch(err => console.error("Error loading users:", err));
-        }
-
-        // নতুন ইউজার তৈরি করার ফাংশন
-        function handleAddNewUser() {
-            let newU = document.getElementById('adminNewUsername').value.trim();
-            let newP = document.getElementById('adminNewPassword').value.trim();
-            let newR = document.getElementById('adminNewRole').value;
-            let msgDiv = document.getElementById('addUserMsg');
-
-            if (!newU || !newP) {
-                msgDiv.className = "text-danger text-center mt-1";
-                msgDiv.innerText = "ইউজারনেম এবং পাসওয়ার্ড উভয়ই দিতে হবে!";
-                return;
-            }
-
-            let payload = {
-                action: "addUser",
-                username: currentLoggedInUser,
-                newUsername: newU,
-                newPassword: newP,
-                newRole: newR
-            };
-
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                msgDiv.className = res.status === 'success' ? "text-success text-center mt-1" : "text-danger text-center mt-1";
-                msgDiv.innerText = res.message;
-                if (res.status === 'success') {
-                    document.getElementById('adminNewUsername').value = '';
-                    document.getElementById('adminNewPassword').value = '';
-                    loadAllUsersForAdmin();
-                }
-            })
-            .catch(err => {
-                msgDiv.className = "text-danger text-center mt-1";
-                msgDiv.innerText = "সার্ভার সংযোগে সমস্যা হয়েছে!";
-            });
-        }
-
-        // ইউজার এডিট করার ফাংশন (পাসওয়ার্ড বা রোল পরিবর্তন)
-        function editUserPrompt(username, currentRole) {
-            let newPass = prompt(username + " এর জন্য নতুন পাসওয়ার্ড দিন (পাসওয়ার্ড পরিবর্তন না করতে চাইলে খালি রাখুন):");
-            let newRole = prompt("নতুন রোল দিন (Admin অথবা user):", currentRole);
-
-            if (newRole === null) return; // ক্যানসেল করলে
-
-            let payload = {
-                action: "updateUser",
-                username: currentLoggedInUser,
-                targetUsername: username,
-                newPassword: newPass ? newPass.trim() : "",
-                newRole: newRole.trim()
-            };
-
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                alert(res.message);
-                if (res.status === 'success') {
-                    loadAllUsersForAdmin();
-                }
-            })
-            .catch(err => alert("সার্ভার সংযোগে সমস্যা হয়েছে!"));
-        }
-
-        // ইউজার ডিলিট করার ফাংশন
-        function deleteUserAction(username) {
-            if (!confirm("আপনি কি নিশ্চিতভাবে এই ইউজারটি ডিলিট করতে চান? (" + username + ")")) return;
-
-            let payload = {
-                action: "deleteUser",
-                username: currentLoggedInUser,
-                targetUsername: username
-            };
-
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                alert(res.message);
-                if (res.status === 'success') {
-                    loadAllUsersForAdmin();
-                }
-            })
-            .catch(err => alert("সার্ভার সংযোগে সমস্যা হয়েছে!"));
         }
 
         function updateUserProfile() {
@@ -1372,6 +1259,124 @@
                 msgDiv.className = "text-danger text-center mb-2";
                 msgDiv.innerText = "সার্ভার সংযোগে সমস্যা হয়েছে!";
             });
+        }
+
+        // নতুন ইউজার তৈরির ফাংশন
+        function handleAddNewUser() {
+            let newU = document.getElementById('adminNewUsername').value.trim();
+            let newP = document.getElementById('adminNewPassword').value.trim();
+            let newR = document.getElementById('adminNewRole').value;
+            let msgDiv = document.getElementById('addUserMsg');
+
+            if (!newU || !newP) {
+                msgDiv.className = "text-danger text-center mt-1";
+                msgDiv.innerText = "ইউজারনেম এবং পাসওয়ার্ড উভয়ই দিতে হবে!";
+                return;
+            }
+
+            let payload = {
+                action: "addUser",
+                newUsername: newU,
+                newPassword: newP,
+                newRole: newR
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                msgDiv.className = res.status === 'success' ? "text-success text-center mt-1" : "text-danger text-center mt-1";
+                msgDiv.innerText = res.message;
+                if (res.status === 'success') {
+                    document.getElementById('adminNewUsername').value = '';
+                    document.getElementById('adminNewPassword').value = '';
+                    loadAllUsersForAdmin();
+                }
+            })
+            .catch(err => {
+                msgDiv.className = "text-danger text-center mt-1";
+                msgDiv.innerText = "সার্ভার সংযোগে সমস্যা হয়েছে!";
+            });
+        }
+
+        // অ্যাডমিন প্যানেলে ইউজার লোড করা এবং টেবিলে দেখানো
+        function loadAllUsersForAdmin() {
+            fetch(`${WEB_APP_URL}?action=getAllUsers`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === "success") {
+                        let tbody = document.getElementById('adminUserTableBody');
+                        tbody.innerHTML = "";
+                        res.users.forEach(u => {
+                            let tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td class="fw-bold">${u.username}</td>
+                                <td>
+                                    <select class="form-select form-select-sm" onchange="changeUserRole('${u.username}', this.value)">
+                                        <option value="Admin" ${u.role.toLowerCase() === 'admin' ? 'selected' : ''}>Admin</option>
+                                        <option value="user" ${u.role.toLowerCase() !== 'admin' ? 'selected' : ''}>User</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button onclick="deleteUserByAdmin('${u.username}')" class="btn btn-danger btn-sm py-0 px-1" style="font-size: 10px;">ডিলিট</button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+                })
+                .catch(err => console.error("Error loading users:", err));
+        }
+
+        // রোল পরিবর্তনের ফাংশন
+        function changeUserRole(username, newRole) {
+            let msgDiv = document.getElementById('adminUpdateMsg');
+            let payload = {
+                action: "updateUserRole",
+                targetUsername: username,
+                newRole: newRole
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                msgDiv.className = res.status === "success" ? "text-success" : "text-danger";
+                msgDiv.innerText = res.message;
+            })
+            .catch(err => {
+                msgDiv.className = "text-danger";
+                msgDiv.innerText = "সার্ভার সংযোগে সমস্যা হয়েছে!";
+            });
+        }
+
+        // ইউজার ডিলিট করার ফাংশন
+        function deleteUserByAdmin(username) {
+            if (!confirm("আপনি কি নিশ্চিতভাবে এই ইউজারটি ডিলিট করতে চান? (" + username + ")")) return;
+
+            let msgDiv = document.getElementById('adminUpdateMsg');
+            let payload = {
+                action: "deleteUser",
+                adminUsername: currentLoggedInUser,
+                targetUsername: username
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert(res.message);
+                if (res.status === "success") {
+                    loadAllUsersForAdmin();
+                }
+            })
+            .catch(err => alert("সার্ভার সংযোগে সমস্যা হয়েছে!"));
         }
     </script>
 </body>
